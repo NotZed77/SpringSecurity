@@ -34,14 +34,34 @@ public class WebSecurityConfig {
 //                        .requestMatchers("/posts/**").authenticated()
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
-                .sessionManagement(sessionConfig -> sessionConfig
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(sessionConfig ->
+                        sessionConfig.maximumSessions(1))
+                .sessionManagement((sessionConfig) ->
+                        sessionConfig.invalidSessionUrl("/invalidSession"));
 //                .formLogin(Customizer.withDefaults());
 
 
         return httpSecurity.build();
     }
+
+
+//    @Bean
+//    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+//        httpSecurity
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/posts","/error","/auth/**").permitAll()
+////                        .requestMatchers("/posts/**").authenticated()
+//                        .anyRequest().authenticated())
+//                .csrf(csrfConfig -> csrfConfig.disable())
+//                .sessionManagement(sessionConfig -> sessionConfig
+//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+////                .formLogin(Customizer.withDefaults());
+//
+//
+//        return httpSecurity.build();
+//    }
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{

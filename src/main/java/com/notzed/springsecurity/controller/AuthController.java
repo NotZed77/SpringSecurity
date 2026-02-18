@@ -3,6 +3,7 @@ package com.notzed.springsecurity.controller;
 import com.notzed.springsecurity.dto.LoginDto;
 import com.notzed.springsecurity.dto.SignupDto;
 import com.notzed.springsecurity.dto.UserDto;
+import com.notzed.springsecurity.entity.SessionEntity;
 import com.notzed.springsecurity.service.AuthService;
 import com.notzed.springsecurity.service.UserService;
 import jakarta.servlet.http.Cookie;
@@ -35,8 +36,14 @@ public class AuthController {
         Cookie cookie = new Cookie("token", token);
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
+        return ResponseEntity.ok(token);
+    }
 
 
+
+    @PostMapping("/session")
+    public ResponseEntity<?> session(@RequestBody SessionEntity session, HttpServletRequest request, HttpServletResponse response){
+        String token = authService.loggingToken(session.getUserId());
         return ResponseEntity.ok(token);
     }
 
