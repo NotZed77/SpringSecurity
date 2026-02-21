@@ -1,6 +1,7 @@
 package com.notzed.springsecurity.config;
 
 import com.notzed.springsecurity.filters.JwtAuthFilter;
+import com.notzed.springsecurity.handler.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,19 +27,26 @@ public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
 
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/posts","/error","/auth/**").permitAll()
+                        .requestMatchers("/posts","/error","/auth/**, /home.html").permitAll()
 //                        .requestMatchers("/posts/**").authenticated()
                         .anyRequest().authenticated())
                 .csrf(csrfConfig -> csrfConfig.disable())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login(oauth2Config ->
+                        oauth2Config.failureUrl("/login?error=true")
+                .successHandler(oAuth2SuccessHandler))
+
                 .sessionManagement(sessionConfig ->
                         sessionConfig.maximumSessions(1))
                 .sessionManagement((sessionConfig) ->
                         sessionConfig.invalidSessionUrl("/invalidSession"));
+
 //                .formLogin(Customizer.withDefaults());
 
 
@@ -67,6 +75,8 @@ public class WebSecurityConfig {
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
         return config.getAuthenticationManager();
     }
+
+
 
 //    @Bean
 //    UserDetailsService myInMemoryDetailsService(){

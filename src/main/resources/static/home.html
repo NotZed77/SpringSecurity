@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+
+        .card {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 350px;
+        }
+
+        h1 {
+            color: #2E7D32;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #2E7D32;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1B5E20;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>✅ Login Successful</h1>
+    <p id="welcomeMessage"></p>
+    <button onclick="logout()">Logout</button>
+</div>
+
+<script>
+    // Get query params
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const email = params.get("email");
+
+    if (name && email) {
+        document.getElementById("welcomeMessage").innerText =
+            `Welcome ${name} (${email})`;
+    } else {
+        document.getElementById("welcomeMessage").innerText =
+            "You are successfully authenticated via OAuth2.";
+    }
+
+    function logout() {
+        window.location.href = "/logout";
+    }
+</script>
+
+</body>
+</html>
