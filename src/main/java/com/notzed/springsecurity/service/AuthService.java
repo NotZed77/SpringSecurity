@@ -19,7 +19,7 @@ public class AuthService {
 
     private final JwtService jwtService;
 
-    private final SessionRepository sessionRepository;
+    private final SessionService sessionService;
 
     private final AuthenticationManager authenticationManager;
 
@@ -33,25 +33,19 @@ public class AuthService {
         User user = (User) authentication.getPrincipal();
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        sessionService.generateNewSession(user, refreshToken);
 
         return new LoginResponseDto(user.getId(), accessToken, refreshToken);
     }
 
     public LoginResponseDto refreshToken(String refreshToken) {
         Long userId = jwtService.getUserIdFromToken(refreshToken);
+        sessionService.validateSession(refreshToken);
         User user = userService.getUserById(userId);
 
         String accessToken = jwtService.generateAccessToken(user);
         return new LoginResponseDto(user.getId(), accessToken, refreshToken);
     }
 
-    public String loggingToken(Long userId){
-            sessionRepository.deleteByUserId(userId);
-            String newToken = UUID.randomUUID().toString(); // --> Generating NEW TOKEN
-            SessionEntity session = new SessionEntity(userId, newToken);
-            sessionRepository.save(session);
-            return newToken;
-
-    }
 
 }
