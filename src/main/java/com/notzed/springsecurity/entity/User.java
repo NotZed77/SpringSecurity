@@ -1,6 +1,5 @@
 package com.notzed.springsecurity.entity;
 
-import com.notzed.springsecurity.entity.enums.Permission;
 import com.notzed.springsecurity.entity.enums.Role;
 import com.notzed.springsecurity.utils.PermissionMapping;
 import jakarta.persistence.*;
@@ -12,9 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
+import static com.notzed.springsecurity.entity.enums.Role.*;
 
 @Entity
 @Getter
@@ -61,5 +60,11 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.email;
+    }
+
+    public int sessionLimitCounter() {
+        if(roles.contains(CREATOR)) return 3;
+        if(roles.contains(ADMIN)) return 5;
+        return 1;
     }
 }

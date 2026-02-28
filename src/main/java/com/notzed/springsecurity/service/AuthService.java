@@ -47,5 +47,9 @@ public class AuthService {
         return new LoginResponseDto(user.getId(), accessToken, refreshToken);
     }
 
+    public void logout(String refreshToken){
+        sessionService.validateSession(refreshToken);
+        sessionService.deleteSession(refreshToken);
+    }
 
 }

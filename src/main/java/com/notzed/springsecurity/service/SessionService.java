@@ -4,7 +4,6 @@ import com.notzed.springsecurity.entity.SessionEntity;
 import com.notzed.springsecurity.entity.User;
 import com.notzed.springsecurity.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.SessionException;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +20,10 @@ public class SessionService {
 
 
     public void generateNewSession(User user, String refreshToken){
-        List<SessionEntity> userSessions = sessionRepository.findByUser(user);
-        if(userSessions.size() == SESSION_LIMIT){
-            userSessions.sort(Comparator.comparing(SessionEntity::getLastUsedAt));
-
-            SessionEntity leastRecentlyUsedSession = userSessions.getFirst();
+        long activeSessions = sessionRepository.countByUser(user);
+        if(activeSessions >= user.sessionLimitCounter()){
+            SessionEntity leastRecentlyUsedSession = (SessionEntity) sessionRepository.findTopByUserOrderByLastUsedAtAsc(user)
+                    .orElseThrow(() -> new RuntimeException("Session not found"));
             sessionRepository.delete(leastRecentlyUsedSession);
         }
 
@@ -41,5 +39,12 @@ public class SessionService {
                 .orElseThrow(() -> new SessionAuthenticationException("Session not found for refreshToken: "+refreshToken));
         session.setLastUsedAt(LocalDateTime.now());
         sessionRepository.save(session);
+    }
+
+    public void deleteSession(String refreshToken){
+        SessionEntity session = sessionRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new SessionAuthenticationException("Session not found for refreshToken: "+refreshToken));
+        sessionRepository.delete(session);
+
     }
 }
